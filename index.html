@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>YouPerry Tube</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+    <link href="style.css" rel="stylesheet">
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Search</h1>
+        <div class="input-group">
+           <input type="text" class="form-control" id="yt_search" placeholder="Search">
+           <span class="input-group-btn">
+                <button class="btn btn-default" type="button" onclick='search()'>Search</button>
+                <button class="btn btn-default" type="button" onclick='clearSearch()'>Clear</button>   
+           </span>
+        </div>
+        <div id="yt_search_results"></div>
+        <h1>Playlist</h1>     
+        <div id="playlist"></div>
+        <div id="controls">
+          <button class="btn" id="btnPrevious" onclick="previous()">Previous</button>
+          <button class="btn" id="btnPlay" onclick="play()">Play</button>
+          <button class="btn" id="btnPause" onclick="pause()">Pause</button>
+          <button class="btn" id="btnNext" onclick="next()">Next</button>
+        </div>
+    </div>
+    <!-- This is the template -->
+    <script id="search-result-template" type="text/x-handlebars-template">
+        {{#each this}}
+        <div class="entry search-result">
+            <h3>{{title}}</h3>
+            <div class="body">
+                {{{desc}}}
+            </div>
+            <button class="btn" onclick="addToPlaylist('{{url}}')">Add to playlist</button>
+        </div>
+        {{/each}}
+    </script>
+      <script id="playlist-template" type="text/x-handlebars-template">
+        {{#each this}}
+        <div id="{{id}}" class="entry playlist-track">
+            <h3 onclick="selectSong('{{url}}')">{{title}}</h3>
+            <div class="body">
+                {{{desc}}}
+            </div>
+            <button class="btn" onclick="removeFromPlaylist('{{url}}')">Remove from playlist</button>
+        </div>
+        {{/each}}
+    </script>
+    <script type="text/javascript" src="app.js"></script>
+</body>
+
+</html>
