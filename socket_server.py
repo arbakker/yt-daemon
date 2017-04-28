@@ -104,14 +104,15 @@ class SocketHandler(websocket.WebSocketHandler):
                 break   
                 
         if index!=-1:
-            # check if to remove item is current item
-            if track['url']==current_track['url']:
-                self.next()
-            # Check if changed to new song, otherwise stop playing
-            if current_track['url']==track['url']:
-                self.stop()
-                current_track={}
-                self.current_changed()
+            if current_track:
+                # check if to remove item is current item
+                if track['url']==current_track['url']:
+                    self.next()
+                # Check if changed to new song, otherwise stop playing
+                if current_track['url']==track['url']:
+                    self.stop()
+                    current_track={}
+                    self.current_changed()
 
             playlist.pop(index)
             self.playlist_changed()
