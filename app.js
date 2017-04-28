@@ -8,6 +8,56 @@ var playlist = [];
 var current_track = {};
 // playing,paused,stopped
 var state="stopped";
+var host; 
+var ws; 
+host=window.location.host;
+ws=new WebSocket('ws://' + host + '/ws');
+
+ws.onopen = function() {
+    //$message.attr("class", 'label label-success');
+    //$message.text('open');
+};
+
+ws.onmessage = function(ev) {
+    var json = JSON.parse(ev.data);
+    //alert(json.command);
+    if (json.command === "playlist_changed") {
+        playlist = json.payload;
+        updatePlaylist();
+    }else if (json.command === "current_changed"){
+        current_track=json.payload;
+        updateCurrent();
+    }else if (json.command === "state_changed"){
+        state=json.payload;
+        updateState();
+    }else if (json.command === "init_state"){
+        init_state=json.payload;
+        state=init_state.state;
+        current_track=init_state.current_track;
+        playlist=init_state.playlist;
+        updatePlaylist();
+        updateCurrent();
+        updateState();
+    }
+};
+
+ws.onclose = function(ev) {
+    //$message.attr("class", 'label label-important');
+    //$message.text('closed');
+};
+ws.onerror = function(ev) {
+    //$message.attr("class", 'label label-warning');
+    //$message.text('error occurred');
+};
+
+$(document).ready(function() {
+  setTimeout(function(){
+  updateState();
+  $("#btnPrevious").prop('disabled', false);
+  $("#btnNext").prop('disabled', false);
+  ws.send(JSON.stringify({ 'init_state': null}));
+   },2000);
+});
 
 function search() {
     var query = $('#yt_search').val();
@@ -75,12 +125,15 @@ function updateState(){
 	if (state=="playing"){
 		$("#btnPlay").prop('disabled', true);
 		$("#btnPause").prop('disabled', false);
+        $("#status").text("Playing: " + current_track.title);
 	}else if (state=="paused"){
 		$("#btnPlay").prop('disabled', false);
 		$("#btnPause").prop('disabled', true);
+        $("#status").text("Paused");
 	}else if (state=="stopped"){
 		$("#btnPlay").prop('disabled', false);
 		$("#btnPause").prop('disabled', true);
+        $("#status").text("Stopped");
 	}
 }
 
@@ -95,46 +148,7 @@ function updatePlaylist() {
     updateCurrent();
 }
 
-var host = window.location.host;
-var ws = new WebSocket('ws://' + host + '/ws');
-var $message = $('#message');
 
-ws.onopen = function() {
-    $message.attr("class", 'label label-success');
-    $message.text('open');
-};
-
-ws.onmessage = function(ev) {
-    var json = JSON.parse(ev.data);
-    //alert(json.command);
-    if (json.command === "playlist_changed") {
-        playlist = json.payload;
-        updatePlaylist();
-    }else if (json.command === "current_changed"){
-    	current_track=json.payload;
-    	updateCurrent();
-    }else if (json.command === "state_changed"){
-    	state=json.payload;
-    	updateState();
-    }else if (json.command === "init_state"){
-    	init_state=json.payload;
-    	state=init_state.state;
-    	current_track=init_state.current_track;
-    	playlist=init_state.playlist;
-    	updatePlaylist();
-    	updateCurrent();
-    	updateState();
-    }
-};
-
-ws.onclose = function(ev) {
-    $message.attr("class", 'label label-important');
-    $message.text('closed');
-};
-ws.onerror = function(ev) {
-    $message.attr("class", 'label label-warning');
-    $message.text('error occurred');
-};
 
 function getTrackByUrl(list,url){
 	var tracks = list.filter(function(element) {
@@ -163,12 +177,3 @@ function removeFromPlaylist(url) {
 	var track = getTrackFromPlaylist(url);
     ws.send(JSON.stringify({ 'remove_track': track }));
 }
-
-$( document ).ready(function() {
-  // Handler for .ready() called.
-  updateState();
-  $("#btnPrevious").prop('disabled', false);
-  $("#btnNext").prop('disabled', false);
-  ws.send(JSON.stringify({ 'init_state': null}));
-
-});

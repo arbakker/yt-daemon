@@ -1,7 +1,6 @@
 .active.playlist-track{
 	background-color: #fcfcc9;
 }
-.top-buffer { margin-top:20px; }
 
 .btn{
 	cursor:pointer;
@@ -9,4 +8,51 @@
 
 .card-title{
 	cursor:pointer;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 85px;
+  margin-top: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+  background-color: #252622;
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+.container {
+  width: auto;
+  max-width: 680px;
+  padding: 0 15px;
+}
+
+.center-me {
+  margin: 0 auto;
+}
+
+.top-buffer { margin-top:20px; }
+.top-buffer10 { margin-top:10px; }
+
+.bg-faded {
+    background-color: #404042;
+}
+
+.status{
+  color:white;
 }
