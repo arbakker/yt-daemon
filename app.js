@@ -86,6 +86,7 @@ function updateState(){
 
 function clearSearch() {
     $("#yt_search_results").html("");
+    $('#yt_search').val("");
 }
 
 function updatePlaylist() {
