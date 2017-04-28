@@ -105,7 +105,7 @@ ws.onopen = function() {
 
 ws.onmessage = function(ev) {
     var json = JSON.parse(ev.data);
-    alert(json.command);
+    //alert(json.command);
     if (json.command === "playlist_changed") {
         playlist = json.payload;
         updatePlaylist();
