@@ -25,7 +25,7 @@ def test():
     global p
     global state
     starttime=time.time()
-    if state=="playing":
+    if state=="playing" or state=="paused":
         track_progress=p.get_position()
         data= { "command":"update_progress", "payload":track_progress}
         data = json.dumps(data)
@@ -244,6 +244,15 @@ class SocketHandler(websocket.WebSocketHandler):
         for c in cl:
             c.write_message(data)
 
+    def seek(self, percentage):
+        global p
+        global state
+        percentage=percentage/100
+        if state=="playing" or state=="paused":
+            p.set_position(percentage)
+
+
+
     def check_origin(self, origin):
         return True
     
@@ -278,6 +287,8 @@ class SocketHandler(websocket.WebSocketHandler):
             self.decrement_volume()
         elif command=="mute":
             self.mute()
+        elif command=="seek":
+            self.seek(payload)
         
    
 

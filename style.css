@@ -70,9 +70,10 @@ body {
 	}
 progress {
 	width: 100%;
-	height: 4px;
+	height: 6px;
 	display: block;
 	/* Important Thing */
 	-webkit-appearance: none;
 	border: none;
+	cursor: pointer;
 }

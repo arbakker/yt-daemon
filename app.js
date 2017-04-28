@@ -53,9 +53,16 @@ ws.onmessage = function(ev) {
 
         $('#progress-track').val(json.payload*100);
     }
-
-    
 };
+
+$('#progress-track').click(function(e) {
+    console.log("progress");
+    var x = e.pageX - this.offsetLeft, // or e.offsetX (less support, though)
+        y = e.pageY - this.offsetTop,  // or e.offsetY
+        clickedValue = x * this.max / this.offsetWidth;
+    console.log(clickedValue);
+    ws.send(JSON.stringify({ 'seek': clickedValue }));
+});
 
 ws.onclose = function(ev) {
     //$message.attr("class", 'label label-important');
