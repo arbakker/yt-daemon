@@ -2,3 +2,11 @@
 	background-color: #fcfcc9;
 }
 .top-buffer { margin-top:20px; }
+
+.btn{
+	cursor:pointer;
+}
+
+.card-title{
+	cursor:pointer;
+}
