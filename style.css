@@ -1,7 +1,3 @@
-.active.playlist-track{
-	background-color: #fcfcc9;
-}
-
 .btn{
 	cursor:pointer;
 }
@@ -38,7 +34,7 @@ body {
 
 .container {
   width: auto;
-  max-width: 680px;
+  max-width: 960px;
   padding: 0 15px;
 }
 
@@ -60,3 +56,10 @@ body {
   overflow: hidden;
   max-width: 350px;
 }
+
+.left-buffer{margin-left:20px;}
+
+.vertical{
+	vertical-align: middle;
+	display: inline;
+	}

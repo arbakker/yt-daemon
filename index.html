@@ -35,7 +35,7 @@
              </span>
                   <input type="text" class="form-control" id="yt_search" placeholder="Search">
                   <span class="input-group-btn">
-                  <button class="btn btn-secondary" type="button" onclick='search()'>Search</button>   
+                  <button id="btn-search" class="btn btn-secondary" type="button" onclick='search()'>Search</button>   
              </span>
               </div>
         </div>
@@ -44,25 +44,21 @@
     <div class="container">
         <div class="mx-1 my-2 row">
             
-        <div class="col-md-6">
-          <div id="search" class="mx-1 my-2 row">
-            
+              
+          <div class="col-md-6">
+            <!--PLAYLIST ROW-->
+            <div class="mx-1 my-2 row">
+            <ul class="list-group" id="playlist"></ul>
+            </div>
           </div>
-
-          <div class="mx-1 my-2 row">
-              <div class="card-group center-me" id="yt_search_results">
-              </div>
-          </div>
-        </div>    
-        <div class="col-md-6">
-          <div class="row mx-1">
-              <h5 class="center-me">Playlist</h5></div>
-          <div class="mx-1 my-2 row">
-              <div class="card-group center-me" id="playlist">
-              </div>
-          </div>
-        </div>  
-    </div>
+          <div class="col-md-6">
+            <!--SEARCH RESULTS ROW-->
+            <div class="mx-1 my-2 row">
+                <ul class="list-group" id="yt_search_results">
+                </ul>
+            </div>
+          </div>  
+      </div>
     <nav class="navbar fixed-bottom navbar-dark bg-faded">
         <div class="form-inline center-me">
         <div class="btn-group mx-1" role="group">
@@ -76,41 +72,33 @@
             <button class="btn btn-secondary "" type="button" id="btnIncreaseVolume" onclick="decrementVolume()"><i class="fa fa-volume-down"></i></button>
             <button class="btn btn-secondary "" type="button" id="btnDecreaseVolume" onclick="incrementVolume()"><i class="fa fa-volume-up"></i></button>
             </div>
+            <p id="volume-status" class="status top-buffer"></p>
         </div>
         <p id="status" class="center-me status"></p>
     </nav>
 
                      
     <script id="search-result-template" type="text/x-handlebars-template">
-        {{#each this}}
-         <div class="card my-1" style="width: 20rem;">
-          <div class="card-block">
-            <h4 class="card-title">{{title}}</h4>
-            <p class="card-text">
-                {{{desc}}}
-            </p>
-            <button onclick="addToPlaylist('{{url}}')" type="button" class="btn btn-primary">
-                              <i class="fa fa-plus"></i>
-                          </button>
+      {{#each this}}
+        <li class="list-group-item list-group-item-action clearfix">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{title}}</h5>
+          <!--<small>3 days ago</small>-->
           </div>
-        </div>
+          <div style="display:block;" class="mb-1">{{{desc}}}</div>
+          <button onclick="addToPlaylist('{{url}}')" type="button" class="btn btn-primary pull-right float-right">
+            <i class="fa fa-plus"></i>
+          </button>
+        </li>
         {{/each}}
     </script>
 
-
       <script id="playlist-template" type="text/x-handlebars-template">
         {{#each this}}
-        <div id="{{id}}" class="card my-1 playlist-track" style="width: 20rem;">
-          <div class="card-block">
-             <h4 class="card-title" onclick="selectSong('{{url}}')">{{title}}</h4>
-            <p class="card-text">
-                {{{desc}}}
-            </p>
-            <button onclick="removeFromPlaylist('{{url}}')" type="button" class="btn btn-primary">
+        <li id="{{id}}" class="list-group-item playlist-track" onclick="selectSong('{{url}}')"><div style="width: 100%;" class="clearfix">{{inc @index}}. {{title}}<button onclick="removeFromPlaylist('{{url}}')" type="button" class="btn btn-secondary pull-right float-right">
                               <i class="fa fa-trash-o"></i>
-                          </button>
-          </div>
-        </div>
+                          </button></div></li>
+
         {{/each}}
     </script>
     <script type="text/javascript" src="app.js"></script>

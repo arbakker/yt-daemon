@@ -6,6 +6,7 @@ var template_playlist = Handlebars.compile(source_playlist);
 var search_result = [];
 var playlist = [];
 var current_track = {};
+var volume=0;
 // playing,paused,stopped
 var state="stopped";
 var host; 
@@ -30,13 +31,18 @@ ws.onmessage = function(ev) {
     }else if (json.command === "state_changed"){
         state=json.payload;
         updateState();
+    }else if (json.command === "volume_changed"){
+        volume=json.payload;
+        updateVolume();
     }else if (json.command === "init_state"){
         init_state=json.payload;
         state=init_state.state;
         current_track=init_state.current_track;
         playlist=init_state.playlist;
+        volume=init_state.volume;
         updatePlaylist();
         updateCurrent();
+        updateVolume();
         updateState();
     }
 };
@@ -58,6 +64,15 @@ $(document).ready(function() {
   ws.send(JSON.stringify({ 'init_state': null}));
    },2000);
 });
+
+$('#yt_search').keypress(function (e) {
+ var key = e.which;
+ if(key == 13)  // the enter key code
+  {
+    $('#btn-search').click();
+    return false;  
+  }
+});   
 
 function search() {
     var query = $('#yt_search').val();
@@ -155,9 +170,22 @@ function clearSearch() {
 }
 
 function updatePlaylist() {
-    var html = template_playlist(playlist);
-    $("#playlist").html(html);
-    updateCurrent();
+    if (playlist.length>0){
+        var html = template_playlist(playlist);
+        $("#playlist").html(html);
+        updateCurrent();
+    }else{
+        var empty='<li class="list-group-item disabled">Playlist is empty</li>';
+        $("#playlist").html(empty);
+    }
+}
+
+function updateVolume(){
+    var volume_string=volume;
+    if (volume===0){
+        volume_string="Muted"
+    }
+    $("#volume-status").text("Volume: "+volume_string);
 }
 
 
@@ -189,3 +217,8 @@ function removeFromPlaylist(url) {
 	var track = getTrackFromPlaylist(url);
     ws.send(JSON.stringify({ 'remove_track': track }));
 }
+
+Handlebars.registerHelper("inc", function(value, options)
+{
+    return parseInt(value) + 1;
+});
