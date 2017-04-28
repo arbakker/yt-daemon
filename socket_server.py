@@ -1,9 +1,12 @@
-from tornado import websocket, web, ioloop, escape
+from tornado import websocket, web, ioloop, escape,gen
 import json,pafy,vlc,os
 from bs4 import BeautifulSoup
 import urllib                                                                                                                                 
 import urllib.parse 
 import threading
+import time
+import datetime
+
 
 cl = []
 playlist=[]
@@ -11,10 +14,23 @@ current_track={}
 instance=vlc.Instance()
 p=instance.media_player_new()
 p_em = p.event_manager()
-p.audio_set_volume(70)
+p.audio_set_volume(80)
 mute_vol=-1
 # playing,paused,stopped
 state="stopped"
+track_progress=0;
+
+def test():
+    global track_progress
+    global p
+    global state
+    starttime=time.time()
+    if state=="playing":
+        track_progress=p.get_position()
+        data= { "command":"update_progress", "payload":track_progress}
+        data = json.dumps(data)
+        for c in cl:
+            c.write_message(data)
 
 
 
@@ -27,7 +43,6 @@ class myThread (threading.Thread):
     def run(self):
         self.socket_handler.change_track_thread()
 
-
 class IndexHandler(web.RequestHandler):
     def get(self):
         self.render("player/index.html")
@@ -37,6 +52,12 @@ class SocketHandler(websocket.WebSocketHandler):
         global p_em
         p_em.event_attach(vlc.EventType.MediaPlayerEndReached, self.end_reached)
 
+    def stopped_state_update(self):
+        data= { "command":"update_progress", "payload":0}
+        data = json.dumps(data)
+        for c in cl:
+            c.write_message(data)
+   
     def end_reached(self,event):
         # required to change track from a different track, since vlc callback cannot callback on the vlc object
         thread1 = myThread(1, "Thread-1", self)
@@ -46,6 +67,8 @@ class SocketHandler(websocket.WebSocketHandler):
         global state
         state="stopped"
         self.next()
+        if state!="playing":
+            self.state_changed("stopped")
 
     def set_track(self, track):
         global p
@@ -105,12 +128,15 @@ class SocketHandler(websocket.WebSocketHandler):
 
     def state_changed(self,in_state):
         global state
+        #print("state_changed: in_state:{},state :{}".format(in_state,state))
         state=in_state
+        if state=="stopped":
+            self.stopped_state_update()
         data= { "command":"state_changed", "payload":state}
         data = json.dumps(data)
         for c in cl:
             c.write_message(data)
-
+        
 
     def playlist_changed(self): 
         global playlist
@@ -168,14 +194,14 @@ class SocketHandler(websocket.WebSocketHandler):
         result=-1
         if p:
             current_volume=p.audio_get_volume()
-            output_volume=int(current_volume/0.7)
+            output_volume=int(current_volume/0.8)
             result=output_volume
         return result
 
     def volume_setter(self,in_volume):
         global p
         if p:
-            out_volume=int(in_volume*0.7)
+            out_volume=int(in_volume*0.8)
             p.audio_set_volume(out_volume)
 
 
@@ -238,6 +264,7 @@ class SocketHandler(websocket.WebSocketHandler):
             else:
                 self.set_track(payload)
         elif command=="pause":
+            print("pause")
             self.pause()
         elif command=="next":
             self.next()
@@ -251,11 +278,14 @@ class SocketHandler(websocket.WebSocketHandler):
             self.decrement_volume()
         elif command=="mute":
             self.mute()
+        
+   
 
 
     def open(self):
         if self not in cl:
             cl.append(self)
+            
 
     def on_close(self):
         if self in cl:
@@ -290,21 +320,43 @@ class ApiHandler(web.RequestHandler):
             soup = BeautifulSoup(vid.renderContents(),"lxml")
             tile_div=soup.find(attrs={'class':'yt-uix-tile-link'})
             desc=soup.find(attrs={'class':'yt-lockup-description'})
+            video_time=soup.find(attrs={'class':'video-time'})
+
             desc_html=""
             if desc:
                 desc_html = "".join([str(x) for x in desc.contents])
             if tile_div:
                 link=tile_div['href']
                 title=tile_div['title']
+                video_time=video_time.text
                 yt_id=link.split("=")[1]
-                item={"url":'https://www.youtube.com' + link,"title":title, "desc":desc_html, "id": yt_id}
+                item={"url":'https://www.youtube.com' + link,"title":title, "desc":desc_html, "id": yt_id, "video_time":video_time}
                 result.append(item)
         self.finish(json.dumps({"results":result}))
 
 root = os.path.dirname(__file__)
 
 
+# @gen.coroutine
+# def auto_loop():
+#     global p
+#     global track_progress
+#     global cl
+#     global state
+#     while True:
+#         starttime=time.time()
+#         while state=="playing":
+#             track_progress=p.get_position()
+#             print("execute progress_updater: {}".format(track_progress))
+#             data= { "command":"update_progress", "payload":track_progress}
+#             data = json.dumps(data)
+#             for c in cl:
+#                 c.write_message(data)
+#             time.sleep(0.5 - ((time.time() - starttime) % 0.5))
 
+#         yield gen.Task(
+#             ioloop.IOLoop.current().add_timeout,
+#             datetime.timedelta(milliseconds=500))
 
 
 #(r'/', IndexHandler),
@@ -317,4 +369,7 @@ app = web.Application([
 
 if __name__ == '__main__':
     app.listen(9999)
-    ioloop.IOLoop.instance().start()
+    loop = ioloop.IOLoop.instance()
+    task = ioloop.PeriodicCallback(test,10)
+    task.start()
+    loop.start()

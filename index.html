@@ -5,19 +5,25 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="description" content="Web application to control YouTube music player running on headless Raspberry Pi">
+    <meta name="author" content="Anton Bakker">
     <link rel="icon" href="https://v4-alpha.getbootstrap.com/favicon.ico">
     <title>YouPerry Tube</title>
+    
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
-    <!-- Custom styles for this template -->
+    
+    <!-- Custom style sheet -->
     <link href="style.css" rel="stylesheet">
-
+    <!-- Bootstrap style sheet -->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+    <!-- JQuery and Handlebars-->
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.6/handlebars.js"></script>
 
+    <!--FONT-->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900,900i" rel="stylesheet"> 
+    <!-- ICONS -->
     <link rel="apple-touch-icon-precomposed" sizes="120x120" href="app_120.png" />
     <link rel="apple-touch-icon-precomposed" sizes="180x180" href="app_180.png" />
     <link rel="apple-touch-icon-precomposed" sizes="76x76" href="app_76.png" />
@@ -59,7 +65,9 @@
             </div>
           </div>  
       </div>
+
     <nav class="navbar fixed-bottom navbar-dark bg-faded">
+        <progress id="progress-track" class="fixed-bottom" value="0" max="100"></progress>
         <div class="form-inline center-me">
         <div class="btn-group mx-1" role="group">
             <button class="btn btn-secondary" type="button" id="btnPrevious" onclick="previous()"><i class="fa fa-step-backward"></i></button>
@@ -83,7 +91,7 @@
         <li class="list-group-item list-group-item-action clearfix">
           <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{title}}</h5>
-          <!--<small>3 days ago</small>-->
+          <small>{{video_time}}</small>
           </div>
           <div style="display:block;" class="mb-1">{{{desc}}}</div>
           <button onclick="addToPlaylist('{{url}}')" type="button" class="btn btn-primary pull-right float-right">
@@ -95,7 +103,7 @@
 
       <script id="playlist-template" type="text/x-handlebars-template">
         {{#each this}}
-        <li id="{{id}}" class="list-group-item playlist-track" onclick="selectSong('{{url}}')"><div style="width: 100%;" class="clearfix">{{inc @index}}. {{title}}<button onclick="removeFromPlaylist('{{url}}')" type="button" class="btn btn-secondary pull-right float-right">
+        <li id="{{id}}" class="list-group-item playlist-track" onclick="selectSong('{{url}}')"><div style="width: 100%;" class="clearfix">{{inc @index}}. {{title}}<button onclick="removeFromPlaylist('{{url}}')" type="button" class="left-buffer btn btn-secondary pull-right float-right">
                               <i class="fa fa-trash-o"></i>
                           </button></div></li>
 

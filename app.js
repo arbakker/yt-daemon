@@ -44,7 +44,17 @@ ws.onmessage = function(ev) {
         updateCurrent();
         updateVolume();
         updateState();
+    }else if (json.command === "update_progress"){
+        // var progress=json.payload*100;
+        //    $( "#progress-track" ).animate({
+        //      value: progress
+        //    }, 200);
+
+
+        $('#progress-track').val(json.payload*100);
     }
+
+    
 };
 
 ws.onclose = function(ev) {
@@ -152,7 +162,7 @@ function updateState(){
 	if (state=="playing"){
 		$("#btnPlay").prop('disabled', true);
 		$("#btnPause").prop('disabled', false);
-        $("#status").text("Playing: " + current_track.title);
+        $("#status").text("Playing: " + current_track.title + " ("+current_track.video_time+")");
 	}else if (state=="paused"){
 		$("#btnPlay").prop('disabled', false);
 		$("#btnPause").prop('disabled', true);
