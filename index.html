@@ -28,7 +28,7 @@
 
 <body>
 <nav class="navbar fixed-top navbar-dark bg-faded">
-        <form class="form-inline center-me">
+        <div class="form-inline center-me">
            <div class="input-group">
                   <span class="input-group-btn">
                 <button class="btn btn-secondary" onclick='clearSearch()' type="button">Clear</button>
@@ -38,7 +38,7 @@
                   <button class="btn btn-secondary" type="button" onclick='search()'>Search</button>   
              </span>
               </div>
-        </form>
+        </div>
     </nav>
     <!-- Begin page content -->
     <div class="container">
@@ -65,12 +65,19 @@
     </div>
     <nav class="navbar fixed-bottom navbar-dark bg-faded">
         <div class="form-inline center-me">
+        <div class="btn-group mx-1" role="group">
             <button class="btn btn-secondary" type="button" id="btnPrevious" onclick="previous()"><i class="fa fa-step-backward"></i></button>
             <button class="btn btn-secondary" type="button" id="btnPlay" onclick="play()"><i class="fa fa-play"></i></button>
             <button class="btn btn-secondary" " type="button" id="btnPause" onclick="pause()"><i class="fa fa-pause "></i></button>
             <button class="btn btn-secondary "" type="button" id="btnNext" onclick="next()"><i class="fa fa-step-forward"></i></button>
+            </div>
+            <div class="btn-group mx-1" role="group"> 
+            <button class="btn btn-secondary "" type="button" id="btnMute" onclick="mute()"><i class="fa fa-volume-off"></i></button>
+            <button class="btn btn-secondary "" type="button" id="btnIncreaseVolume" onclick="decrementVolume()"><i class="fa fa-volume-down"></i></button>
+            <button class="btn btn-secondary "" type="button" id="btnDecreaseVolume" onclick="incrementVolume()"><i class="fa fa-volume-up"></i></button>
+            </div>
         </div>
-        <p id="status" class="center-me status">STATUS TEXT</p>
+        <p id="status" class="center-me status"></p>
     </nav>
 
                      

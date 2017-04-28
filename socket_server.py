@@ -8,6 +8,7 @@ cl = []
 playlist=[]
 current_track={}
 p={}
+mute_vol=-1
 # playing,paused,stopped
 state="stopped"
 
@@ -23,20 +24,21 @@ class SocketHandler(websocket.WebSocketHandler):
         global state
         print("set_track: " + str(track))
         print("set_track: " + track['url'])
-
         if state=="playing":
             p.stop()
             state="stopped"
         if state=="stopped" or state=="paused":                        
             video = pafy.new(track['url'])
             p=vlc.MediaPlayer(video.getbestaudio().url)
+            if p.audio_get_volume()==0:
+                self.set_volume(100)
             current_track=track
             self.current_changed()
         # keep paused state when paused
         if state=="stopped":
             p.play()
             self.state_changed("playing")
-
+        print("volume: " + str(p.audio_get_volume()))
 
     def play_pause(self):
         p.play()
@@ -123,7 +125,44 @@ class SocketHandler(websocket.WebSocketHandler):
         data = json.dumps(data)
         for c in cl:
             c.write_message(data)
+    
+    def mute(self):
+        global p, mute_vol
+        if p:
+            # mute if mute_vol -1
+            if mute_vol==-1:
+                mute_vol=p.audio_get_volume();
+                self.set_volume(0)
+            # else restore volume
+            else:
+                self.set_volume(mute_vol)
+                mute_vol=-1
 
+    def set_volume(self, volume):
+        global p
+        p.audio_set_volume(volume)
+        data= { "command":"volume_changed", "payload":volume}
+        data = json.dumps(data)
+        for c in cl:
+            c.write_message(data)
+
+    def increment_volume(self):
+        global p, mute_vol
+        if p:
+            mute_vol=-1
+            current_volume=p.audio_get_volume()
+            # volume ranges from 0,70 otherwise sounds gets distorted
+            if current_volume<66:
+                current_volume+=5
+                self.set_volume(current_volume)
+
+    def decrement_volume(self):
+        global p
+        if p:
+            current_volume=p.audio_get_volume()
+            if current_volume>4:
+                current_volume-=5
+                self.set_volume(current_volume)
 
     def current_changed(self):
         global current_track
@@ -160,6 +199,12 @@ class SocketHandler(websocket.WebSocketHandler):
             self.previous()
         elif command=="init_state":
             self.init_state()
+        elif command=="increment_volume":
+            self.increment_volume()
+        elif command=="decrement_volume":
+            self.decrement_volume()
+        elif command=="mute":
+            self.mute()
 
 
     def open(self):

@@ -95,6 +95,18 @@ function pause(){
 	}
 }
 
+function mute(level){
+    ws.send(JSON.stringify({ 'mute': null}));
+}
+
+function incrementVolume(level){
+    ws.send(JSON.stringify({ 'increment_volume': null}));
+}
+
+function decrementVolume(level){
+    ws.send(JSON.stringify({ 'decrement_volume': null}));
+}
+
 function next(){
 	ws.send(JSON.stringify({ 'next': null }));
 }
